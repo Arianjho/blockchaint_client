@@ -4,11 +4,17 @@ import { conection } from "../conection/conn";
 
 const nombre = ref("");
 const categoria = ref("");
-const urlArchivo = ref("");
+const archivo = ref(null); // Referencia al archivo
 
 const success = ref(false);
-const errorMensaje = ref(""); // Agrega una referencia para almacenar mensajes de error
+const errorMensaje = ref("");
 
+// Maneja la carga del archivo
+function handleFileUpload(event) {
+  archivo.value = event.target.files[0];
+}
+
+// Obtén la cuenta de Ethereum
 async function getAccount() {
   const accounts = await window.ethereum.request({
     method: "eth_requestAccounts",
@@ -16,32 +22,43 @@ async function getAccount() {
   return accounts[0];
 }
 
+// Crea el registro
 async function crearRegistro() {
   const cuenta = await getAccount();
+  if (!archivo.value) {
+    errorMensaje.value = "Por favor, selecciona un archivo para subir.";
+    return;
+  }
+  const nombreArchivo = archivo.value.name; // Usa el nombre del archivo directamente
+
   try {
-    // Estimar el gas necesario para la transacción y convertirlo a una cadena si es un BigInt
     const estimatedGas = await conection.contrato.methods
-      .crearRegistro(nombre.value, categoria.value, urlArchivo.value)
+      .crearRegistro(nombre.value, categoria.value, nombreArchivo)
       .estimateGas({ from: cuenta });
-    const estimatedGasString =
-      typeof estimatedGas === "bigint" ? estimatedGas.toString() : estimatedGas;
 
-    // Añadir un margen de error al gas estimado
-    const gasLimit = Math.floor(Number(estimatedGasString) * 1.2);
+    const gasLimit = Math.floor(Number(estimatedGas) * 1.2);
 
-    // Enviar la transacción con el gas estimado
     await conection.contrato.methods
-      .crearRegistro(nombre.value, categoria.value, urlArchivo.value)
+      .crearRegistro(nombre.value, categoria.value, nombreArchivo)
       .send({ from: cuenta, gas: gasLimit.toString() });
+
+    // Guarda el archivo en localStorage
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const archivos = JSON.parse(localStorage.getItem("archivos") || "{}");
+      archivos[nombreArchivo] = e.target.result; // Guarda el contenido del archivo
+      localStorage.setItem("archivos", JSON.stringify(archivos));
+    };
+    reader.readAsDataURL(archivo.value); // Lee el archivo como Data URL
 
     nombre.value = "";
     categoria.value = "";
-    urlArchivo.value = "";
+    archivo.value = null;
     success.value = true;
-    errorMensaje.value = ""; // Limpia el mensaje de error sFi la transacción es exitosa
+    errorMensaje.value = "";
   } catch (error) {
     console.error("Error al crear el registro:", error);
-    errorMensaje.value = error.message; // Almacena el mensaje de error para mostrarlo en la UI
+    errorMensaje.value = error.message;
     success.value = false;
   }
 }
@@ -76,11 +93,11 @@ async function crearRegistro() {
       <div class="form-group mb-3">
         <label class="mb-1" for="inputarchivo">Archivo:</label>
         <input
-          v-model="urlArchivo"
-          type="text"
+          type="file"
           class="form-control"
           id="inputarchivo"
           placeholder="Ingrese el nombre del archivo"
+          @change="handleFileUpload"
           required
         />
       </div>

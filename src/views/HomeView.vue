@@ -5,6 +5,23 @@ import { conection } from "../conection/conn";
 const registros = ref([]);
 const loading = ref(true);
 
+function descargarArchivo(nombreArchivo) {
+  const archivos = JSON.parse(localStorage.getItem("archivos") || "{}");
+  const archivoDataUrl = archivos[nombreArchivo];
+  if (!archivoDataUrl) {
+    alert("Archivo no encontrado.");
+    return;
+  }
+
+  // Crea un enlace y descarga el archivo
+  const link = document.createElement("a");
+  link.href = archivoDataUrl;
+  link.setAttribute("download", nombreArchivo);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); // No olvides limpiar el DOM
+}
+
 async function listarRegistros() {
   try {
     const total = await conection.contrato.methods.totalRegistros().call();
@@ -18,7 +35,7 @@ async function listarRegistros() {
     registros.value = tempRegistros;
     loading.value = false;
   } catch (error) {
-    console.error('Error al listar registros:', error);
+    console.error("Error al listar registros:", error);
   }
 }
 
@@ -44,7 +61,14 @@ onMounted(() => {
           <td>{{ registro.id }}</td>
           <td>{{ registro.nombre }}</td>
           <td>{{ registro.categoria }}</td>
-          <td>{{ registro.urlArchivo }}</td>
+          <td>
+            <button
+              class="btn btn-primary"
+              @click="descargarArchivo(registro.urlArchivo)"
+            >
+              Descargar archivo
+            </button>
+          </td>
         </tr>
       </tbody>
       <tbody v-else-if="loading">
@@ -81,7 +105,7 @@ th {
 .text-center {
   text-align: center;
 }
-.thead{
+.thead {
   background-color: #000;
 }
 .h2 {
