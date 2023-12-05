@@ -62,10 +62,7 @@ onMounted(() => {
           <td>{{ registro.nombre }}</td>
           <td>{{ registro.categoria }}</td>
           <td>
-            <button
-              class="btn btn-primary"
-              @click="descargarArchivo(registro.urlArchivo)"
-            >
+            <button class="btn btn-primary" @click="descargarArchivo(registro.urlArchivo)">
               Descargar archivo
             </button>
           </td>
@@ -105,9 +102,11 @@ th {
 .text-center {
   text-align: center;
 }
+
 .thead {
   background-color: #000;
 }
+
 .h2 {
   margin: 1rem 0;
 }

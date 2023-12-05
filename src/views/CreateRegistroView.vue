@@ -70,36 +70,18 @@ async function crearRegistro() {
     <form @submit.prevent="crearRegistro">
       <div class="form-group mb-3">
         <label class="mb-1" for="nombreinput">Nombre:</label>
-        <input
-          v-model="nombre"
-          type="text"
-          class="form-control"
-          id="nombreinput"
-          placeholder="Ingrese el nombre"
-          required
-        />
+        <input v-model="nombre" type="text" class="form-control" id="nombreinput" placeholder="Ingrese el nombre"
+          required />
       </div>
       <div class="form-group mb-3">
         <label class="mb-1" for="inputcategoria">Categoria:</label>
-        <input
-          v-model="categoria"
-          type="text"
-          class="form-control"
-          id="inputcategoria"
-          placeholder="Ingrese la categoria"
-          required
-        />
+        <input v-model="categoria" type="text" class="form-control" id="inputcategoria" placeholder="Ingrese la categoria"
+          required />
       </div>
       <div class="form-group mb-3">
         <label class="mb-1" for="inputarchivo">Archivo:</label>
-        <input
-          type="file"
-          class="form-control"
-          id="inputarchivo"
-          placeholder="Ingrese el nombre del archivo"
-          @change="handleFileUpload"
-          required
-        />
+        <input type="file" class="form-control" id="inputarchivo" placeholder="Ingrese el nombre del archivo"
+          @change="handleFileUpload" required />
       </div>
       <button type="submit" class="btn btn-primary">Guardar Registro</button>
     </form>
@@ -112,6 +94,7 @@ async function crearRegistro() {
 .h2 {
   margin: 1rem 0;
 }
+
 .text {
   margin: 0.5rem 0;
 }
